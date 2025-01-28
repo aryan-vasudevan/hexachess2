@@ -75,6 +75,7 @@ export default function Board() {
     ];
 
     const handleDragEnd = (event: any) => {
+        // The piece that was dragged, and the tile it was dropped on
         const { active, over } = event;
 
         // Check if the piece was dropped over a valid tile
@@ -82,17 +83,19 @@ export default function Board() {
             const fromTileId = active.id;
             const toTileId = over.id;
 
-            // Update the pieceLocations state
-            setPieceLocations((prev) => {
-                const updated = { ...prev };
-                updated[toTileId] = updated[fromTileId];
-                delete updated[fromTileId]; 
-                return updated;
-            });
+            if (fromTileId != toTileId)
+                // Update the piece locations state
+                setPieceLocations((prev) => {
+                    const updated = { ...prev };
+                    updated[toTileId] = updated[fromTileId];
+                    delete updated[fromTileId]; 
+                    return updated;
+                });
         }
     };
 
     return (
+        // If a piece is dropped in the board
         <DndContext onDragEnd={handleDragEnd}>
             <div>
                 {boardMap.map((row, rowIndex) => (

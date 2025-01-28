@@ -29,7 +29,7 @@ export default function Piece({ id, pieceType, color }: PieceProps) {
             <img
                 src={`pieces/${pieceType}${color}.png`}
                 alt={`${pieceType} (${color})`}
-                width={40}
+                width={47}
             />
         </div>
     );

@@ -15,10 +15,10 @@ export default function Tile({ id, pieceType, color }: TileProps) {
         <div className="relative" ref={setNodeRef}>
             <img
                 src="tile.png"
-                className="mx-[17px] my-[-16.5px]"
+                className="mx-[16px] my-[-20.5px]"
                 alt="tile"
-                height={60}
-                width={60}
+                height={70}
+                width={70}
             />
             {/* Conditionally render piece, only if a piece does exist on the tile*/}
             {pieceType != null && color != null && (

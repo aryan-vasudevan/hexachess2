@@ -1,14 +1,16 @@
+"use client"
+
 import Tile from "./tile";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { DndContext } from "@dnd-kit/core";
+import { useState } from "react";
 
 export default function Board() {
-    const pieceLocations: {
+    const [pieceLocations, setPieceLocations] = useState<{
         [key: string]: {
             pieceType: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
             color: "W" | "B";
         };
-    } = {
+    }>({
         t1: { pieceType: "bishop", color: "B" },
         t2: { pieceType: "queen", color: "B" },
         t3: { pieceType: "king", color: "B" },
@@ -46,7 +48,7 @@ export default function Board() {
         t63: { pieceType: "pawn", color: "W" },
         t62: { pieceType: "pawn", color: "W" },
         t57: { pieceType: "pawn", color: "W" },
-    };
+    });
 
     const boardMap: string[][] = [
         ["", "", "", "", "", "t1", "", "", "", "", ""],
@@ -72,29 +74,50 @@ export default function Board() {
         ["", "", "", "", "", "t91", "", "", "", "", ""],
     ];
 
+    const handleDragEnd = (event: any) => {
+        const { active, over } = event;
+
+        // Check if the piece was dropped over a valid tile
+        if (over) {
+            const fromTileId = active.id;
+            const toTileId = over.id;
+
+            // Update the pieceLocations state
+            setPieceLocations((prev) => {
+                const updated = { ...prev };
+                updated[toTileId] = updated[fromTileId];
+                delete updated[fromTileId]; 
+                return updated;
+            });
+        }
+    };
+
     return (
-        <div>
-            {boardMap.map((row, rowIndex) => (
-                <div key={rowIndex} className="flex justify-center">
-                    {row.map((cell, cellIndex) => (
-                        <div key={cellIndex}>
-                            {/* Only render a piece if a tile has a piece on it, otherwise just the tile */}
-                            {cell.startsWith("t") ? (
-                                cell in pieceLocations ? (
-                                    <Tile
-                                        pieceType={
-                                            pieceLocations[cell].pieceType
-                                        }
-                                        color={pieceLocations[cell].color}
-                                    />
-                                ) : (
-                                    <Tile />
-                                )
-                            ) : null}
-                        </div>
-                    ))}
-                </div>
-            ))}
-        </div>
+        <DndContext onDragEnd={handleDragEnd}>
+            <div>
+                {boardMap.map((row, rowIndex) => (
+                    <div key={rowIndex} className="flex justify-center">
+                        {row.map((cell, cellIndex) => (
+                            <div key={cellIndex}>
+                                {/* Only render a piece if a tile has a piece on it, otherwise just the tile */}
+                                {cell.startsWith("t") ? (
+                                    cell in pieceLocations ? (
+                                        <Tile
+                                            id={cell}
+                                            pieceType={
+                                                pieceLocations[cell].pieceType
+                                            }
+                                            color={pieceLocations[cell].color}
+                                        />
+                                    ) : (
+                                        <Tile id={cell} />
+                                    )
+                                ) : null}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </DndContext>
     );
 }

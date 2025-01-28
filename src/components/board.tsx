@@ -83,12 +83,12 @@ export default function Board() {
             const fromTileId = active.id;
             const toTileId = over.id;
 
-            if (fromTileId != toTileId)
+            if (fromTileId != toTileId && !pieceLocations[toTileId])
                 // Update the piece locations state
                 setPieceLocations((prev) => {
                     const updated = { ...prev };
                     updated[toTileId] = updated[fromTileId];
-                    delete updated[fromTileId]; 
+                    delete updated[fromTileId];
                     return updated;
                 });
         }

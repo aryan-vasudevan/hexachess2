@@ -3,7 +3,7 @@ import Board from "../components/board";
 
 export default function Home() {
     return (
-        <div>
+        <div className="my-[17px]">
             <Board />
         </div>
     );

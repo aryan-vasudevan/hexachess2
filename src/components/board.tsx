@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
@@ -83,7 +83,7 @@ export default function Board() {
             const fromTileId = active.id;
             const toTileId = over.id;
 
-            if (fromTileId != toTileId && !pieceLocations[toTileId])
+            if (fromTileId != toTileId && !pieceLocations[toTileId]) {
                 // Update the piece locations state
                 setPieceLocations((prev) => {
                     const updated = { ...prev };
@@ -91,6 +91,7 @@ export default function Board() {
                     delete updated[fromTileId];
                     return updated;
                 });
+            }
         }
     };
 
@@ -98,28 +99,40 @@ export default function Board() {
         // If a piece is dropped in the board
         <DndContext onDragEnd={handleDragEnd}>
             <div>
-                {boardMap.map((row, rowIndex) => (
-                    <div key={rowIndex} className="flex justify-center">
-                        {row.map((cell, cellIndex) => (
-                            <div key={cellIndex}>
-                                {/* Only render a piece if a tile has a piece on it, otherwise just the tile */}
-                                {cell.startsWith("t") ? (
-                                    cell in pieceLocations ? (
-                                        <Tile
-                                            id={cell}
-                                            pieceType={
-                                                pieceLocations[cell].pieceType
-                                            }
-                                            color={pieceLocations[cell].color}
-                                        />
-                                    ) : (
-                                        <Tile id={cell} />
-                                    )
-                                ) : null}
-                            </div>
-                        ))}
-                    </div>
-                ))}
+                {boardMap.map((row, rowIndex) => {
+                    // Set tileColor for the row based on the rowIndex
+                    const rowTileColor = rowIndex % 3;
+
+                    return (
+                        <div key={rowIndex} className="flex justify-center">
+                            {row.map((cell, cellIndex) => (
+                                <div key={cellIndex}>
+                                    {/* Only render a piece if a tile has a piece on it, otherwise just the tile */}
+                                    {cell.startsWith("t") ? (
+                                        cell in pieceLocations ? (
+                                            <Tile
+                                                id={cell}
+                                                tileColor={rowTileColor.toString()}
+                                                pieceType={
+                                                    pieceLocations[cell]
+                                                        .pieceType
+                                                }
+                                                pieceColor={
+                                                    pieceLocations[cell].color
+                                                }
+                                            />
+                                        ) : (
+                                            <Tile
+                                                id={cell}
+                                                tileColor={rowTileColor.toString()}
+                                            />
+                                        )
+                                    ) : null}
+                                </div>
+                            ))}
+                        </div>
+                    );
+                })}
             </div>
         </DndContext>
     );

@@ -24,12 +24,12 @@ export default function Piece({ id, pieceType, pieceColor }: PieceProps) {
             {...listeners} 
             {...attributes} 
             style={style} 
-            className="absolute z-10 bottom-[12px] left-[27px]"
+            className="absolute z-10 bottom-[11px] left-[25.5px]"
         >
             <img
                 src={`pieces/${pieceType}${pieceColor}.png`}
                 alt={`${pieceType} (${pieceColor})`}
-                width={47}
+                width={50}
             />
         </div>
     );

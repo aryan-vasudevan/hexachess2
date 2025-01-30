@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
 const gameSchema = new mongoose.Schema({
-    boardState: { type: Object, required: true },
     pieceLocations: { type: Object, required: true },
 });
 
-const Game = mongoose.model("Game", gameSchema);
+const Game =
+    mongoose.models.Game || mongoose.model("Game", gameSchema, "games");
 
 export default Game;

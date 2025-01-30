@@ -2,54 +2,22 @@
 
 import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-export default function Board() {
+interface BoardProps {
+    gameId: string;
+}
+
+const getGame = async (gameId: string) => {
+    const res = await axios.get(`/api/getGame?gameId=${gameId}`);
+    return res.data.pieceLocations; // Return the pieceLocations from the API
+};
+
+export default function Board({ gameId }: BoardProps) {
     const [pieceLocations, setPieceLocations] = useState<{
-        [key: string]: {
-            pieceType: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
-            color: "W" | "B";
-        };
-    }>({
-        t1: { pieceType: "bishop", color: "B" },
-        t2: { pieceType: "queen", color: "B" },
-        t3: { pieceType: "king", color: "B" },
-        t4: { pieceType: "knight", color: "B" },
-        t5: { pieceType: "bishop", color: "B" },
-        t6: { pieceType: "knight", color: "B" },
-        t7: { pieceType: "rook", color: "B" },
-        t10: { pieceType: "rook", color: "B" },
-        t11: { pieceType: "pawn", color: "B" },
-        t13: { pieceType: "bishop", color: "B" },
-        t15: { pieceType: "pawn", color: "B" },
-        t17: { pieceType: "pawn", color: "B" },
-        t20: { pieceType: "pawn", color: "B" },
-        t23: { pieceType: "pawn", color: "B" },
-        t25: { pieceType: "pawn", color: "B" },
-        t29: { pieceType: "pawn", color: "B" },
-        t30: { pieceType: "pawn", color: "B" },
-        t35: { pieceType: "pawn", color: "B" },
-
-        t91: { pieceType: "bishop", color: "W" },
-        t90: { pieceType: "king", color: "W" },
-        t89: { pieceType: "queen", color: "W" },
-        t88: { pieceType: "knight", color: "W" },
-        t87: { pieceType: "bishop", color: "W" },
-        t86: { pieceType: "knight", color: "W" },
-        t85: { pieceType: "rook", color: "W" },
-        t82: { pieceType: "rook", color: "W" },
-        t81: { pieceType: "pawn", color: "W" },
-        t79: { pieceType: "bishop", color: "W" },
-        t77: { pieceType: "pawn", color: "W" },
-        t75: { pieceType: "pawn", color: "W" },
-        t72: { pieceType: "pawn", color: "W" },
-        t69: { pieceType: "pawn", color: "W" },
-        t67: { pieceType: "pawn", color: "W" },
-        t63: { pieceType: "pawn", color: "W" },
-        t62: { pieceType: "pawn", color: "W" },
-        t57: { pieceType: "pawn", color: "W" },
-    });
-
+        [key: string]: any;
+    }>({});
     const boardMap: string[][] = [
         ["", "", "", "", "", "t1", "", "", "", "", ""],
         ["", "", "", "", "t2", "", "t3", "", "", "", ""],
@@ -74,6 +42,18 @@ export default function Board() {
         ["", "", "", "", "", "t91", "", "", "", "", ""],
     ];
 
+    // Run anytime gameId changes (or when gameId is created)
+    useEffect(() => {
+        // Fetch the game data and set pieceLocations when the component mounts
+        // Define function so it can wait
+        const fetchGameData = async () => { 
+            const pieces = await getGame(gameId);
+            setPieceLocations(pieces);
+        };
+
+        fetchGameData();
+    }, [gameId]);
+
     const handleDragEnd = (event: any) => {
         // The piece that was dragged, and the tile it was dropped on
         const { active, over } = event;
@@ -96,12 +76,11 @@ export default function Board() {
     };
 
     return (
-        // If a piece is dropped in the board
         <DndContext onDragEnd={handleDragEnd}>
             <div>
                 {boardMap.map((row, rowIndex) => {
                     // Set tileColor for the row based on the rowIndex
-                    const rowTileColor = rowIndex % 3;
+                    const rowTileColor = rowIndex % 2; // Adjust this based on your preference for color logic
 
                     return (
                         <div key={rowIndex} className="flex justify-center">

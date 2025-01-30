@@ -11,7 +11,7 @@ interface BoardProps {
 
 const getGame = async (gameId: string) => {
     const res = await axios.get(`/api/getGame?gameId=${gameId}`);
-    return res.data.pieceLocations; // Return the pieceLocations from the API
+    return res.data.pieceLocations; 
 };
 
 export default function Board({ gameId }: BoardProps) {
@@ -80,7 +80,7 @@ export default function Board({ gameId }: BoardProps) {
             <div>
                 {boardMap.map((row, rowIndex) => {
                     // Set tileColor for the row based on the rowIndex
-                    const rowTileColor = rowIndex % 2; // Adjust this based on your preference for color logic
+                    const rowTileColor = rowIndex % 3;
 
                     return (
                         <div key={rowIndex} className="flex justify-center">

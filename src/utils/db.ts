@@ -8,10 +8,7 @@ export const connectDB = async () => {
             throw new Error("MONGODB_URI is not defined");
         }
 
-        console.log(`Connecting to MongoDB at ${MONGODB_URI}`);
-
         if (mongoose.connection.readyState >= 1) {
-            console.log("Already connected to MongoDB");
             return;
         }
 

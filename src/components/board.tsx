@@ -11,7 +11,7 @@ interface BoardProps {
 
 const getGame = async (gameId: string) => {
     const res = await axios.get(`/api/getGame?gameId=${gameId}`);
-    return res.data.pieceLocations; 
+    return res.data.pieceLocations;
 };
 
 export default function Board({ gameId }: BoardProps) {
@@ -46,13 +46,13 @@ export default function Board({ gameId }: BoardProps) {
     useEffect(() => {
         // Fetch the game data and set pieceLocations when the component mounts
         // Define function so it can wait
-        const fetchGameData = async () => { 
+        const fetchGameData = async () => {
             const pieces = await getGame(gameId);
             setPieceLocations(pieces);
         };
 
         fetchGameData();
-    }, [gameId]);
+    }, []);
 
     const handleDragEnd = (event: any) => {
         // The piece that was dragged, and the tile it was dropped on
@@ -71,6 +71,17 @@ export default function Board({ gameId }: BoardProps) {
                     delete updated[fromTileId];
                     return updated;
                 });
+
+                const updateGameData = async () => {
+                    await axios.put("/api/updateGame", {
+                        gameId,
+                        pieceLocations,
+                    });
+                };
+
+                updateGameData();
+
+                
             }
         }
     };

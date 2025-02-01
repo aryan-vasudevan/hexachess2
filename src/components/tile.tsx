@@ -17,7 +17,7 @@ export default function Tile({ id, tileColor, pieceType, pieceColor }: TileProps
     return (
         <div className="relative" ref={setNodeRef}>
             <img
-                src={`tile${tileColor}.png`}
+                src={`/tile${tileColor}.png`}
                 className="mx-[16px] my-[-20.5px]"
                 alt="tile"
                 height={70}

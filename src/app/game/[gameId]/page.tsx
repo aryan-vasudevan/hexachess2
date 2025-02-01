@@ -5,9 +5,10 @@ import axios from "axios";
 import Board from "@/components/board";
 
 export default function GamePage() {
+    const { gameId } = useParams(); 
     return (
         <div>
-            <h1>Hexagonal Chess</h1>
+            <Board gameId={`${gameId}`}></Board>
         </div>
     );
 }

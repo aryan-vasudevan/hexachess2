@@ -27,7 +27,7 @@ export default function Piece({ id, pieceType, pieceColor }: PieceProps) {
             className="absolute z-10 bottom-[11px] left-[25.5px]"
         >
             <img
-                src={`pieces/${pieceType}${pieceColor}.png`}
+                src={`/pieces/${pieceType}${pieceColor}.png`}
                 alt={`${pieceType} (${pieceColor})`}
                 width={50}
             />

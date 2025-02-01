@@ -54,6 +54,7 @@ export default function Board({ gameId }: BoardProps) {
         fetchGameData();
     }, []);
 
+    // Implies move was made
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
 
@@ -79,8 +80,6 @@ export default function Board({ gameId }: BoardProps) {
             }
         }
     };
-
-
 
     return (
         <DndContext onDragEnd={handleDragEnd}>

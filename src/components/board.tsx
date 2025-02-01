@@ -15,7 +15,7 @@ const getGame = async (gameId: string) => {
 };
 
 export default function Board({ gameId }: BoardProps) {
-    const [pieceLocations, setPieceLocations] = useState<{
+    let [pieceLocations, setPieceLocations] = useState<{
         [key: string]: any;
     }>({});
     const boardMap: string[][] = [
@@ -55,36 +55,32 @@ export default function Board({ gameId }: BoardProps) {
     }, []);
 
     const handleDragEnd = (event: any) => {
-        // The piece that was dragged, and the tile it was dropped on
         const { active, over } = event;
 
-        // Check if the piece was dropped over a valid tile
         if (over) {
             const fromTileId = active.id;
             const toTileId = over.id;
 
-            if (fromTileId != toTileId && !pieceLocations[toTileId]) {
-                // Update the piece locations state
+            if (fromTileId !== toTileId && !pieceLocations[toTileId]) {
                 setPieceLocations((prev) => {
                     const updated = { ...prev };
                     updated[toTileId] = updated[fromTileId];
                     delete updated[fromTileId];
+
+                    // Send the updated state to the database after it changes
+                    axios.put("/api/updateGame", {
+                        gameId,
+                        pieceLocations: updated,
+                    });
+
+                    // Use the updated piece locations
                     return updated;
                 });
-
-                const updateGameData = async () => {
-                    await axios.put("/api/updateGame", {
-                        gameId,
-                        pieceLocations,
-                    });
-                };
-
-                updateGameData();
-
-                
             }
         }
     };
+
+
 
     return (
         <DndContext onDragEnd={handleDragEnd}>

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
     await connectDB();
-    
+
     const { gameId, pieceLocations } = await req.json();
 
     // Find and update game at the same time

@@ -14,7 +14,7 @@ export async function PUT(req: Request) {
     if (!game.playerWhite) {
         game.playerWhite = playerId;
     }
-    if (!game.playerBlack) {
+    else if (!game.playerBlack) {
         game.playerBlack = playerId;
     }
 

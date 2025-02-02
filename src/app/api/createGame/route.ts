@@ -47,9 +47,12 @@ export async function POST(req: Request) {
             t62: { pieceType: "pawn", color: "W" },
             t57: { pieceType: "pawn", color: "W" },
         },
+        playerWhite: null,
+        playerBlack: null,
+        turn: null
     });
     await newGame.save();
 
     // Send gameId to frontend (the game id is automatically created)
-    return NextResponse.json({ gameId: newGame._id }, { status: 201 });
+    return NextResponse.json({ gameId: newGame._id });
 }

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Board from "@/components/board";
 import { Button } from "@mui/material";
+import axios from "axios";
 
 export default function GamePage() {
     const params = useParams();
@@ -11,6 +12,17 @@ export default function GamePage() {
     const gameId = Array.isArray(params?.gameId)
         ? params.gameId[0]
         : params?.gameId;
+
+    const joinGame = async (gameId: string, playerId: string) => {
+        const res = axios.put(`/api/joinGame?gameId=${gameId}&playerId=${playerId}`);
+    };
+
+    useEffect(() => {
+        const playerId = "abc123";
+        if (gameId) {
+            joinGame(gameId, playerId);
+        }
+    }, []);
 
     return (
         <div className="my-[100px] place-items-center">

@@ -31,7 +31,7 @@ export default function GamePage() {
                 variant="contained"
                 onClick={async () => {
                     await navigator.clipboard.writeText(
-                        `hexachess.vercel.app/game/${gameId}`
+                        `hexachess2.vercel.app/game/${gameId}`
                     );
                 }}
             >

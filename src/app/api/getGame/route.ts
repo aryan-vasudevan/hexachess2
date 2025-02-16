@@ -1,18 +1,26 @@
-import { connectDB } from "@/utils/db";
-import Game from "@/utils/models/gameModel";
+import { db } from "@/utils/firebase";
+import { ref, get } from "firebase/database";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-    await connectDB();
+    const { searchParams } = new URL(req.url);
+    const gameId = searchParams.get("gameId");
 
-    // Create url object
-    const url = new URL(req.url);
+    if (!gameId) {
+        return NextResponse.json({ error: "Missing gameId" }, { status: 400 });
+    }
 
-    const gameId = url.searchParams.get("gameId");
+    try {
+        const gameRef = ref(db, `games/${gameId}`); // Reference to game in Firebase
+        const snapshot = await get(gameRef); // Fetch game data
 
-    // Find the game in the db using the gameId
-    const game = await Game.findById(gameId);
-
-    // Return the piece locations of the game
-    return NextResponse.json({ pieceLocations: game.pieceLocations });
+        return snapshot.exists()
+            ? NextResponse.json(snapshot.val())
+            : NextResponse.json({ error: "Game not found" }, { status: 404 });
+    } catch (error) {
+        return NextResponse.json(
+            { error: "Failed to fetch game" },
+            { status: 500 }
+        );
+    }
 }

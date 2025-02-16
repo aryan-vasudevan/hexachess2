@@ -1,13 +1,14 @@
+import { db } from "@/utils/firebase";
+import { ref, push, set } from "firebase/database";
 import { NextResponse } from "next/server";
-import Game from "@/utils/models/gameModel";
-import { connectDB } from "@/utils/db";
 
 export async function POST(req: Request) {
-    // Wait untill mongoDB is connected
-    await connectDB();
+    // Reference to all games in Firebase
+    const gamesRef = ref(db, "games");
+    // Create a new game entry
+    const newGameRef = push(gamesRef);
 
-    // Create the game
-    const newGame = new Game({
+    const gameData = {
         pieceLocations: {
             t1: { pieceType: "bishop", color: "B" },
             t2: { pieceType: "queen", color: "B" },
@@ -49,10 +50,12 @@ export async function POST(req: Request) {
         },
         playerWhite: null,
         playerBlack: null,
-        turn: null
-    });
-    await newGame.save();
+        turn: null,
+    };
 
-    // Send gameId to frontend (the game id is automatically created)
-    return NextResponse.json({ gameId: newGame._id });
+    // Save game data to Firebase
+    await set(newGameRef, gameData);
+
+    // Return game ID to frontend
+    return NextResponse.json({ gameId: newGameRef.key });
 }

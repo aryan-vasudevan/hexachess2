@@ -38,18 +38,19 @@ export async function PUT(req: Request) {
         }
 
         // Assign player to an open spot
-        const updatedGame = {
-            playerWhite: game.playerWhite || playerId,
-            playerBlack: game.playerWhite
-                ? game.playerBlack || playerId
-                : game.playerBlack,
-        };
+        let updatedGame = { ...game }; // Create a copy of the current game data
+        if (!game.playerWhite) {
+            updatedGame.playerWhite = playerId; // Assign player to white if not already assigned
+        } else if (!game.playerBlack) {
+            updatedGame.playerBlack = playerId; // Assign player to black if not already assigned
+        }
 
-        // Update Firebase
+        // Update Firebase with the new game state
         await update(gameRef, updatedGame);
 
         return NextResponse.json({ game: updatedGame });
     } catch (error) {
+        console.error("Error in join game route:", error); // Log the error for debugging
         return NextResponse.json(
             { error: "Failed to join game" },
             { status: 500 }

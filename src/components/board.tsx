@@ -3,21 +3,17 @@
 import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { db, ref, onValue, update } from "@/utils/firebase"; // Import Firebase
 
 interface BoardProps {
     gameId: string;
 }
 
-const getGame = async (gameId: string) => {
-    const res = await axios.get(`/api/getGame?gameId=${gameId}`);
-    return res.data.pieceLocations;
-};
-
 export default function Board({ gameId }: BoardProps) {
-    let [pieceLocations, setPieceLocations] = useState<{
+    const [pieceLocations, setPieceLocations] = useState<{
         [key: string]: any;
     }>({});
+
     const boardMap: string[][] = [
         ["", "", "", "", "", "t1", "", "", "", "", ""],
         ["", "", "", "", "t2", "", "t3", "", "", "", ""],
@@ -42,19 +38,24 @@ export default function Board({ gameId }: BoardProps) {
         ["", "", "", "", "", "t91", "", "", "", "", ""],
     ];
 
-    // Run anytime gameId changes (or when gameId is created)
     useEffect(() => {
-        // Fetch the game data and set pieceLocations when the component mounts
-        // Define function so it can wait
-        const fetchGameData = async () => {
-            const pieces = await getGame(gameId);
-            setPieceLocations(pieces);
-        };
+        if (!gameId) return;
 
-        fetchGameData();
-    }, []);
+        const gameRef = ref(db, `games/${gameId}/pieceLocations`);
 
-    // Implies move was made
+        // Subscribe to changes in the game state
+        const unsubscribe = onValue(gameRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const updatedPieceLocations = snapshot.val();
+                // Trigger re-render by updating the state
+                setPieceLocations(updatedPieceLocations);
+            }
+        });
+        // Cleanup on unmount
+        return () => unsubscribe();
+    }, [gameId]);
+
+    // Handle drag and drop
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
 
@@ -63,20 +64,16 @@ export default function Board({ gameId }: BoardProps) {
             const toTileId = over.id;
 
             if (fromTileId !== toTileId && !pieceLocations[toTileId]) {
-                setPieceLocations((prev) => {
-                    const updated = { ...prev };
-                    updated[toTileId] = updated[fromTileId];
-                    delete updated[fromTileId];
+                const updated = { ...pieceLocations };
+                updated[toTileId] = updated[fromTileId];
+                delete updated[fromTileId];
 
-                    // Send the updated state to the database after it changes
-                    axios.put("/api/updateGame", {
-                        gameId,
-                        pieceLocations: updated,
-                    });
+                // Update Firebase with the new state
+                const gameRef = ref(db, `games/${gameId}/pieceLocations`);
+                update(gameRef, updated);
 
-                    // Use the updated piece locations
-                    return updated;
-                });
+                // Trigger re-render by updating the state
+                setPieceLocations(updated);
             }
         }
     };
@@ -85,14 +82,12 @@ export default function Board({ gameId }: BoardProps) {
         <DndContext onDragEnd={handleDragEnd}>
             <div>
                 {boardMap.map((row, rowIndex) => {
-                    // Set tileColor for the row based on the rowIndex
                     const rowTileColor = rowIndex % 3;
 
                     return (
                         <div key={rowIndex} className="flex justify-center">
                             {row.map((cell, cellIndex) => (
                                 <div key={cellIndex}>
-                                    {/* Only render a piece if a tile has a piece on it, otherwise just the tile */}
                                     {cell.startsWith("t") ? (
                                         cell in pieceLocations ? (
                                             <Tile

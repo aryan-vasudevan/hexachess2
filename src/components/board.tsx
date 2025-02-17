@@ -7,12 +7,10 @@ import { db, ref, onValue, update } from "@/utils/firebase"; // Import Firebase
 
 interface BoardProps {
     gameId: string;
+    pieceLocations: { [key: string]: any };
 }
 
-export default function Board({ gameId }: BoardProps) {
-    const [pieceLocations, setPieceLocations] = useState<{
-        [key: string]: any;
-    }>({});
+export default function Board({ gameId, pieceLocations }: BoardProps) {
 
     const boardMap: string[][] = [
         ["", "", "", "", "", "t1", "", "", "", "", ""],
@@ -38,23 +36,6 @@ export default function Board({ gameId }: BoardProps) {
         ["", "", "", "", "", "t91", "", "", "", "", ""],
     ];
 
-    useEffect(() => {
-        if (!gameId) return;
-
-        const gameRef = ref(db, `games/${gameId}/pieceLocations`);
-
-        // Subscribe to changes in the game state
-        const unsubscribe = onValue(gameRef, (snapshot) => {
-            if (snapshot.exists()) {
-                const updatedPieceLocations = snapshot.val();
-                // Trigger re-render by updating the state
-                setPieceLocations(updatedPieceLocations);
-            }
-        });
-        // Cleanup on unmount
-        return () => unsubscribe();
-    }, [gameId]);
-
     // Handle drag and drop
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
@@ -72,8 +53,6 @@ export default function Board({ gameId }: BoardProps) {
                 const gameRef = ref(db, `games/${gameId}/pieceLocations`);
                 update(gameRef, updated);
 
-                // Trigger re-render by updating the state
-                setPieceLocations(updated);
             }
         }
     };

@@ -4,6 +4,7 @@ import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
 import { useState, useEffect } from "react";
 import { db, ref, onValue, update } from "@/utils/firebase"; // Import Firebase
+import axios from "axios";
 
 interface BoardProps {
     gameId: string;
@@ -50,8 +51,10 @@ export default function Board({ gameId, pieceLocations }: BoardProps) {
                 delete updated[fromTileId];
 
                 // Update Firebase with the new state
-                const gameRef = ref(db, `games/${gameId}/pieceLocations`);
-                update(gameRef, updated);
+                axios.put("/api/updateGame", {
+                    gameId,
+                    pieceLocations: updated, 
+                });
 
             }
         }

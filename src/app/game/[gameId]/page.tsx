@@ -45,10 +45,10 @@ export default function GamePage() {
 
             const gameRef = ref(db, `games/${gameId}/pieceLocations`);
             const unsubscribe = onValue(gameRef, (snapshot) => {
-                console.log("onvalue");
                 if (snapshot.exists()) {
                     setPieceLocations(snapshot.val());
                 }
+                console.log(pieceLocations);
             });
 
             // Cleanup listener on unmount

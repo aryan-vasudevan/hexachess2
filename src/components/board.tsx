@@ -2,8 +2,6 @@
 
 import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
-import { useState, useEffect } from "react";
-import { db, ref, onValue, update } from "@/utils/firebase"; // Import Firebase
 import axios from "axios";
 
 interface BoardProps {
@@ -12,7 +10,7 @@ interface BoardProps {
 }
 
 export default function Board({ gameId, pieceLocations }: BoardProps) {
-
+    // For placing tiles
     const boardMap: string[][] = [
         ["", "", "", "", "", "t1", "", "", "", "", ""],
         ["", "", "", "", "t2", "", "t3", "", "", "", ""],
@@ -37,7 +35,7 @@ export default function Board({ gameId, pieceLocations }: BoardProps) {
         ["", "", "", "", "", "t91", "", "", "", "", ""],
     ];
 
-    // Handle drag and drop
+    // Handle drag and drop pieces
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
 
@@ -45,22 +43,23 @@ export default function Board({ gameId, pieceLocations }: BoardProps) {
             const fromTileId = active.id;
             const toTileId = over.id;
 
+            // If a piece moved to an empty tile, update the piece location and the database
             if (fromTileId !== toTileId && !pieceLocations[toTileId]) {
                 const updated = { ...pieceLocations };
                 updated[toTileId] = updated[fromTileId];
                 delete updated[fromTileId];
 
-                // Update Firebase with the new state
+                // Use this formate because passing JSON
                 axios.put("/api/updateGame", {
                     gameId,
                     pieceLocations: updated, 
                 });
-
             }
         }
     };
 
     return (
+        // Area for drag and drop
         <DndContext onDragEnd={handleDragEnd}>
             <div>
                 {boardMap.map((row, rowIndex) => {

@@ -11,6 +11,9 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Connect to realtime database
 const app = initializeApp(firebaseConfig);
+
+// Database operations
 export const db = getDatabase(app);
 export { ref, onValue, set, update };

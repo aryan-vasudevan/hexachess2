@@ -3,24 +3,13 @@ import { ref, get } from "firebase/database";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
+    // Receive game id
     const { searchParams } = new URL(req.url);
     const gameId = searchParams.get("gameId");
 
-    if (!gameId) {
-        return NextResponse.json({ error: "Missing gameId" }, { status: 400 });
-    }
+    // Fetch the current game data
+    const gameRef = ref(db, `games/${gameId}`);
+    const snapshot = await get(gameRef);
 
-    try {
-        const gameRef = ref(db, `games/${gameId}`); // Reference to game in Firebase
-        const snapshot = await get(gameRef); // Fetch game data
-
-        return snapshot.exists()
-            ? NextResponse.json(snapshot.val())
-            : NextResponse.json({ error: "Game not found" }, { status: 404 });
-    } catch (error) {
-        return NextResponse.json(
-            { error: "Failed to fetch game" },
-            { status: 500 }
-        );
-    }
+    return NextResponse.json(snapshot.val());
 }

@@ -1,14 +1,16 @@
 import { useDraggable } from "@dnd-kit/core";
 
 interface PieceProps {
-    id: string; // Unique identifier for the piece
+    // Unique identifier for the piece
+    id: string;
     pieceType: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
     pieceColor: "W" | "B";
 }
 
 export default function Piece({ id, pieceType, pieceColor }: PieceProps) {
+    // Allow this piece to be draggable
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
-        id: id, // The unique identifier for this draggable piece
+        id: id,
     });
 
     // Apply a transform to move the piece as it is dragged

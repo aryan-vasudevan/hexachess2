@@ -5,9 +5,9 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
     // Reference to all games in Firebase
     const gamesRef = ref(db, "games");
+
     // Create a new game entry
     const newGameRef = push(gamesRef);
-
     const gameData = {
         pieceLocations: {
             t1: { pieceType: "bishop", color: "B" },
@@ -53,9 +53,8 @@ export async function POST(req: Request) {
         turn: null,
     };
 
-    // Save game data to Firebase
+    // Save new game to firebase
     await set(newGameRef, gameData);
 
-    // Return game ID to frontend
     return NextResponse.json({ gameId: newGameRef.key });
 }

@@ -3,57 +3,31 @@ import { ref, get, update } from "firebase/database";
 import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
-    try {
-        const url = new URL(req.url);
-        const gameId = url.searchParams.get("gameId");
-        const playerId = url.searchParams.get("playerId");
+    // Receive game id, player id
+    const url = new URL(req.url);
+    const gameId = url.searchParams.get("gameId");
+    const playerId = url.searchParams.get("playerId");
 
-        if (!gameId || !playerId) {
-            return NextResponse.json(
-                { error: "Missing gameId or playerId" },
-                { status: 400 }
-            );
-        }
+    // Fetch the current game data
+    const gameRef = ref(db, `games/${gameId}`);
+    const snapshot = await get(gameRef);
+    const game = snapshot.val();
 
-        // Reference the game in Firebase
-        const gameRef = ref(db, `games/${gameId}`);
-
-        // Fetch the current game data
-        const snapshot = await get(gameRef);
-        if (!snapshot.exists()) {
-            return NextResponse.json(
-                { error: "Game not found" },
-                { status: 404 }
-            );
-        }
-
-        const game = snapshot.val();
-
-        // Prevent a third player from joining
-        if (game.playerWhite && game.playerBlack) {
-            return NextResponse.json(
-                { error: "Game is full" },
-                { status: 403 }
-            );
-        }
-
-        // Assign player to an open spot
-        let updatedGame = { ...game }; // Create a copy of the current game data
-        if (!game.playerWhite) {
-            updatedGame.playerWhite = playerId; // Assign player to white if not already assigned
-        } else if (!game.playerBlack) {
-            updatedGame.playerBlack = playerId; // Assign player to black if not already assigned
-        }
-
-        // Update Firebase with the new game state
-        await update(gameRef, updatedGame);
-
-        return NextResponse.json({ game: updatedGame });
-    } catch (error) {
-        console.error("Error in join game route:", error); // Log the error for debugging
-        return NextResponse.json(
-            { error: "Failed to join game" },
-            { status: 500 }
-        );
+    // If there are already 2 people in the game, prevent the third from joining
+    if (game.playerWhite && game.playerBlack) {
+        return NextResponse.json({ error: "Game is full" }, { status: 403 });
     }
+
+    // Player 1 is white, player 2 is black
+    let updatedGame = { ...game };
+    if (!game.playerWhite) {
+        updatedGame.playerWhite = playerId;
+    } else if (!game.playerBlack) {
+        updatedGame.playerBlack = playerId;
+    }
+
+    // Update firebase with the new game state
+    await update(gameRef, updatedGame);
+
+    return NextResponse.json({ status: 200, game: updatedGame });
 }

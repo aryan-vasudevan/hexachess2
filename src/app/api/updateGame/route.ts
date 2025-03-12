@@ -3,9 +3,10 @@ import { ref, set } from "firebase/database";
 import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
+    // Receive game id, piece locations
     const { gameId, pieceLocations } = await req.json();
 
-    // Save the updated game state in Firebase
+    // Update game state in firebase
     await set(ref(db, `games/${gameId}/pieceLocations`), pieceLocations);
 
     return NextResponse.json({ status: 200, pieceLocations });

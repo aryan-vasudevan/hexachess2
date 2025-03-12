@@ -3,6 +3,8 @@ import { ref, get, update } from "firebase/database";
 import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
+    let playerColor = "";
+
     // Receive game id, player id
     const url = new URL(req.url);
     const gameId = url.searchParams.get("gameId");
@@ -22,12 +24,14 @@ export async function PUT(req: Request) {
     let updatedGame = { ...game };
     if (!game.playerWhite) {
         updatedGame.playerWhite = playerId;
+        playerColor = "W";
     } else if (!game.playerBlack) {
         updatedGame.playerBlack = playerId;
+        playerColor = "B";
     }
 
     // Update firebase with the new game state
     await update(gameRef, updatedGame);
 
-    return NextResponse.json({ status: 200, game: updatedGame });
+    return NextResponse.json({ status: 200, playerColor: playerColor });
 }

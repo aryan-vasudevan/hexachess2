@@ -3,13 +3,19 @@
 import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
 import axios from "axios";
+import isValidMove from "@/utils/moveValidation";
 
 interface BoardProps {
     gameId: string;
     pieceLocations: { [key: string]: any };
+    playerColor: "W" | "B";
 }
 
-export default function Board({ gameId, pieceLocations }: BoardProps) {
+export default function Board({
+    gameId,
+    pieceLocations,
+    playerColor,
+}: BoardProps) {
     // For placing tiles
     const boardMap: string[][] = [
         ["", "", "", "", "", "t1", "", "", "", "", ""],
@@ -38,7 +44,6 @@ export default function Board({ gameId, pieceLocations }: BoardProps) {
     // Handle drag and drop pieces
     const handleDragEnd = (event: any) => {
         const { active, over } = event;
-
         if (over) {
             const fromTileId = active.id;
             const toTileId = over.id;
@@ -49,10 +54,10 @@ export default function Board({ gameId, pieceLocations }: BoardProps) {
                 updated[toTileId] = updated[fromTileId];
                 delete updated[fromTileId];
 
-                // Use this formate because passing JSON
+                // Use this format because passing JSON
                 axios.put("/api/updateGame", {
                     gameId,
-                    pieceLocations: updated, 
+                    pieceLocations: updated,
                 });
             }
         }
@@ -81,6 +86,7 @@ export default function Board({ gameId, pieceLocations }: BoardProps) {
                                                 pieceColor={
                                                     pieceLocations[cell].color
                                                 }
+                                                playerColor={playerColor}
                                             />
                                         ) : (
                                             <Tile

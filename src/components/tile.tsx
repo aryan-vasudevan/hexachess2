@@ -4,12 +4,13 @@ import { useDroppable } from "@dnd-kit/core";
 interface TileProps {
     id: string;
     tileColor: string;
+    playerColor?: "W" | "B";
     pieceType?: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
     pieceColor?: "W" | "B";
 }
 
-export default function Tile({ id, tileColor, pieceType, pieceColor }: TileProps) {
-    // Allow this piece to be droppable
+export default function Tile({ id, tileColor, playerColor, pieceType, pieceColor }: TileProps) {
+    // Allow this tile to be droppable
     const { setNodeRef, isOver } = useDroppable({
         id: id.toString(),
     });
@@ -24,13 +25,26 @@ export default function Tile({ id, tileColor, pieceType, pieceColor }: TileProps
                 width={70}
             />
             {/* Conditionally render piece, only if a piece does exist on the tile*/}
-            {pieceType != null && pieceColor != null && (
-                <Piece
-                    id={id.toString()}
-                    pieceType={pieceType}
-                    pieceColor={pieceColor}
-                />
-            )}
+            {pieceType != null &&
+                pieceColor != null &&
+                playerColor === pieceColor && (
+                    <Piece
+                        id={id.toString()}
+                        pieceType={pieceType}
+                        pieceColor={pieceColor}
+                        draggable={true}
+                    />
+                )}
+            {pieceType != null &&
+                pieceColor != null &&
+                playerColor != pieceColor && (
+                    <Piece
+                        id={id.toString()}
+                        pieceType={pieceType}
+                        pieceColor={pieceColor}
+                        draggable={false}
+                    />
+                )}
         </div>
     );
 }

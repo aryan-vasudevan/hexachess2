@@ -20,6 +20,8 @@ export default function GamePage() {
         [key: string]: any;
     }>({});
 
+    const [playerColor, setPlayerColor] = useState("white");
+
     // If the player had already joined a game, extract the player id from local storage instead of creating a new one
     const getOrCreatePlayerId = () => {
         let playerId = localStorage.getItem("playerId");
@@ -35,6 +37,7 @@ export default function GamePage() {
         const res = await axios.put(
             `/api/joinGame?gameId=${gameId}&playerId=${playerId}`
         );
+        setPlayerColor(res.data.playerColor);
     };
 
     // Listen for live updates to the game from firebase
@@ -45,10 +48,10 @@ export default function GamePage() {
 
             const gameRef = ref(db, `games/${gameId}/pieceLocations`);
             const unsubscribe = onValue(gameRef, (snapshot) => {
+                console.log(playerColor)
                 if (snapshot.exists()) {
                     setPieceLocations(snapshot.val());
                 }
-                console.log(pieceLocations);
             });
 
             return () => unsubscribe();
@@ -59,7 +62,11 @@ export default function GamePage() {
         <div className="my-[100px] place-items-center">
             {/* Provide piece locations for rendering and game id to update game state from board component */}
             {gameId && pieceLocations && (
-                <Board gameId={gameId} pieceLocations={pieceLocations} />
+                <Board
+                    gameId={gameId}
+                    pieceLocations={pieceLocations}
+                    playerColor={playerColor}
+                />
             )}
 
             <Button

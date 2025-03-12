@@ -6,10 +6,10 @@ import axios from "axios";
 import { Button } from "@mui/material";
 
 export default function Home() {
-    // Router
     const router = useRouter(); 
     const [loading, setLoading] = useState(false);
 
+    // Create a game and receive game id
     const createGame = async () => {
         setLoading(true);
         const res = await axios.post("/api/createGame");

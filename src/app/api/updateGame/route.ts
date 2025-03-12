@@ -1,21 +1,13 @@
-import { connectDB } from "@/utils/db";
-import Game from "@/utils/models/gameModel";
+import { db } from "@/utils/firebase";
+import { ref, set } from "firebase/database";
 import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
-    await connectDB();
-
+    // Receive game id, piece locations
     const { gameId, pieceLocations } = await req.json();
 
-    // Find and update game at the same time
-    const updatedGame = await Game.findByIdAndUpdate(
-        gameId,
-        { pieceLocations },
-        { new: true }
-    );
+    // Update game state in firebase
+    await set(ref(db, `games/${gameId}/pieceLocations`), pieceLocations);
 
-    return NextResponse.json({
-        status: 200,
-        pieceLocations: updatedGame.pieceLocations,
-    });
+    return NextResponse.json({ status: 200, pieceLocations });
 }

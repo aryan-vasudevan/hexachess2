@@ -1,18 +1,15 @@
-import { connectDB } from "@/utils/db";
-import Game from "@/utils/models/gameModel";
+import { db } from "@/utils/firebase";
+import { ref, get } from "firebase/database";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
-    await connectDB();
+    // Receive game id
+    const { searchParams } = new URL(req.url);
+    const gameId = searchParams.get("gameId");
 
-    // Create url object
-    const url = new URL(req.url);
+    // Fetch the current game data
+    const gameRef = ref(db, `games/${gameId}`);
+    const snapshot = await get(gameRef);
 
-    const gameId = url.searchParams.get("gameId");
-
-    // Find the game in the db using the gameId
-    const game = await Game.findById(gameId);
-
-    // Return the piece locations of the game
-    return NextResponse.json({ pieceLocations: game.pieceLocations });
+    return NextResponse.json(snapshot.val());
 }

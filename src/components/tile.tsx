@@ -9,11 +9,11 @@ interface TileProps {
 }
 
 export default function Tile({ id, tileColor, pieceType, pieceColor }: TileProps) {
+    // Allow this piece to be droppable
     const { setNodeRef, isOver } = useDroppable({
         id: id.toString(),
     });
-
-    if (id)
+    
     return (
         <div className="relative" ref={setNodeRef}>
             <img
@@ -25,7 +25,11 @@ export default function Tile({ id, tileColor, pieceType, pieceColor }: TileProps
             />
             {/* Conditionally render piece, only if a piece does exist on the tile*/}
             {pieceType != null && pieceColor != null && (
-                <Piece id={id.toString()} pieceType={pieceType} pieceColor={pieceColor} />
+                <Piece
+                    id={id.toString()}
+                    pieceType={pieceType}
+                    pieceColor={pieceColor}
+                />
             )}
         </div>
     );

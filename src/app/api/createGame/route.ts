@@ -50,7 +50,7 @@ export async function POST(req: Request) {
         },
         playerWhite: null,
         playerBlack: null,
-        turn: "white",
+        turn: "W",
     };
 
     // Save new game to firebase

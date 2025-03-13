@@ -3,7 +3,7 @@
 import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
 import axios from "axios";
-import isValidMove from "@/utils/moveValidation";
+import { isValidMove } from "@/utils/moveValidation";
 
 interface BoardProps {
     gameId: string;
@@ -70,19 +70,20 @@ export default function Board({
         if (over) {
             const fromTileId = active.id;
             const toTileId = over.id;
+            
+            isValidMove({ gameId, playerColor, fromTileId, toTileId })
+            // // If a piece moved to an empty tile, update the piece location and the database
+            // if (fromTileId !== toTileId && !pieceLocations[toTileId]) {
+            //     const updated = { ...pieceLocations };
+            //     updated[toTileId] = updated[fromTileId];
+            //     delete updated[fromTileId];
 
-            // If a piece moved to an empty tile, update the piece location and the database
-            if (fromTileId !== toTileId && !pieceLocations[toTileId]) {
-                const updated = { ...pieceLocations };
-                updated[toTileId] = updated[fromTileId];
-                delete updated[fromTileId];
-
-                // Use this format because passing JSON
-                axios.put("/api/updateGame", {
-                    gameId,
-                    pieceLocations: updated,
-                });
-            }
+            //     // Use this format because passing JSON
+            //     axios.put("/api/updateGame", {
+            //         gameId,
+            //         pieceLocations: updated,
+            //     });
+            // }
         }
     };
 

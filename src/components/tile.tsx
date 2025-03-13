@@ -4,7 +4,7 @@ import { useDroppable } from "@dnd-kit/core";
 interface TileProps {
     id: string;
     tileColor: string;
-    playerColor?: "W" | "B";
+    playerColor: "W" | "B";
     pieceType?: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
     pieceColor?: "W" | "B";
 }
@@ -18,7 +18,7 @@ export default function Tile({ id, tileColor, playerColor, pieceType, pieceColor
     return (
         <div className="relative" ref={setNodeRef}>
             <img
-                src={`/tile${tileColor}.png`}
+                src={`/tiles${playerColor}/tile${tileColor}.png`}
                 className="mx-[16px] my-[-20.5px]"
                 alt="tile"
                 height={70}

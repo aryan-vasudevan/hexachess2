@@ -20,7 +20,7 @@ export default function GamePage() {
         [key: string]: any;
     }>({});
 
-    const [playerColor, setPlayerColor] = useState("white");
+    const [playerColor, setPlayerColor] = useState<"W" | "B">("W");
 
     // If the player had already joined a game, extract the player id from local storage instead of creating a new one
     const getOrCreatePlayerId = () => {
@@ -48,7 +48,6 @@ export default function GamePage() {
 
             const gameRef = ref(db, `games/${gameId}/pieceLocations`);
             const unsubscribe = onValue(gameRef, (snapshot) => {
-                console.log(playerColor)
                 if (snapshot.exists()) {
                     setPieceLocations(snapshot.val());
                 }

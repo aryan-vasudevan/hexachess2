@@ -17,7 +17,7 @@ export default function Board({
     playerColor,
 }: BoardProps) {
     // For placing tiles
-    const boardMap: string[][] = [
+    const boardMapW: string[][] = [
         ["", "", "", "", "", "t1", "", "", "", "", ""],
         ["", "", "", "", "t2", "", "t3", "", "", "", ""],
         ["", "", "", "t4", "", "t5", "", "t6", "", "", ""],
@@ -39,6 +39,29 @@ export default function Board({
         ["", "", "", "t86", "", "t87", "", "t88", "", "", ""],
         ["", "", "", "", "t89", "", "t90", "", "", "", ""],
         ["", "", "", "", "", "t91", "", "", "", "", ""],
+    ];
+    const boardMapB: string[][] = [
+        ["", "", "", "", "", "t91", "", "", "", "", ""],
+        ["", "", "", "", "t90", "", "t89", "", "", "", ""],
+        ["", "", "", "t88", "", "t87", "", "t86", "", "", ""],
+        ["", "", "t85", "", "t84", "", "t83", "", "t82", "", ""],
+        ["", "t81", "", "t80", "", "t79", "", "t78", "", "t77", ""],
+        ["t76", "", "t75", "", "t74", "", "t73", "", "t72", "", "t71"],
+        ["", "t70", "", "t69", "", "t68", "", "t67", "", "t66", ""],
+        ["t65", "", "t64", "", "t63", "", "t62", "", "t61", "", "t60"],
+        ["", "t59", "", "t58", "", "t57", "", "t56", "", "t55", ""],
+        ["t54", "", "t53", "", "t52", "", "t51", "", "t50", "", "t49"],
+        ["", "t48", "", "t47", "", "t46", "", "t45", "", "t44", ""],
+        ["t43", "", "t42", "", "t41", "", "t40", "", "t39", "", "t38"],
+        ["", "t37", "", "t36", "", "t35", "", "t34", "", "t33", ""],
+        ["t32", "", "t31", "", "t30", "", "t29", "", "t28", "", "t27"],
+        ["", "t26", "", "t25", "", "t24", "", "t23", "", "t22", ""],
+        ["t21", "", "t20", "", "t19", "", "t18", "", "t17", "", "t16"],
+        ["", "t15", "", "t14", "", "t13", "", "t12", "", "t11", ""],
+        ["", "", "t10", "", "t9", "", "t8", "", "t7", "", ""],
+        ["", "", "", "t6", "", "t5", "", "t4", "", "", ""],
+        ["", "", "", "", "t3", "", "t2", "", "", "", ""],
+        ["", "", "", "", "", "t1", "", "", "", "", ""],
     ];
 
     // Handle drag and drop pieces
@@ -67,39 +90,97 @@ export default function Board({
         // Area for drag and drop
         <DndContext onDragEnd={handleDragEnd}>
             <div>
-                {boardMap.map((row, rowIndex) => {
-                    const rowTileColor = rowIndex % 3;
+                {playerColor === "W" ? (
+                    <div>
+                        {boardMapW.map((row, rowIndex) => {
+                            const rowTileColor = rowIndex % 3;
 
-                    return (
-                        <div key={rowIndex} className="flex justify-center">
-                            {row.map((cell, cellIndex) => (
-                                <div key={cellIndex}>
-                                    {cell.startsWith("t") ? (
-                                        cell in pieceLocations ? (
-                                            <Tile
-                                                id={cell}
-                                                tileColor={rowTileColor.toString()}
-                                                pieceType={
-                                                    pieceLocations[cell]
-                                                        .pieceType
-                                                }
-                                                pieceColor={
-                                                    pieceLocations[cell].color
-                                                }
-                                                playerColor={playerColor}
-                                            />
-                                        ) : (
-                                            <Tile
-                                                id={cell}
-                                                tileColor={rowTileColor.toString()}
-                                            />
-                                        )
-                                    ) : null}
+                            return (
+                                <div
+                                    key={rowIndex}
+                                    className="flex justify-center"
+                                >
+                                    {row.map((cell, cellIndex) => (
+                                        <div key={cellIndex}>
+                                            {cell.startsWith("t") ? (
+                                                cell in pieceLocations ? (
+                                                    <Tile
+                                                        id={cell}
+                                                        tileColor={rowTileColor.toString()}
+                                                        pieceType={
+                                                            pieceLocations[cell]
+                                                                .pieceType
+                                                        }
+                                                        pieceColor={
+                                                            pieceLocations[cell]
+                                                                .color
+                                                        }
+                                                        playerColor={
+                                                            playerColor
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <Tile
+                                                        id={cell}
+                                                        tileColor={rowTileColor.toString()}
+                                                        playerColor={
+                                                            playerColor
+                                                        }
+                                                    />
+                                                )
+                                            ) : null}
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    );
-                })}
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <div>
+                        {boardMapB.map((row, rowIndex) => {
+                            const rowTileColor = rowIndex % 3;
+
+                            return (
+                                <div
+                                    key={rowIndex}
+                                    className="flex justify-center"
+                                >
+                                    {row.map((cell, cellIndex) => (
+                                        <div key={cellIndex}>
+                                            {cell.startsWith("t") ? (
+                                                cell in pieceLocations ? (
+                                                    <Tile
+                                                        id={cell}
+                                                        tileColor={rowTileColor.toString()}
+                                                        pieceType={
+                                                            pieceLocations[cell]
+                                                                .pieceType
+                                                        }
+                                                        pieceColor={
+                                                            pieceLocations[cell]
+                                                                .color
+                                                        }
+                                                        playerColor={
+                                                            playerColor
+                                                        }
+                                                    />
+                                                ) : (
+                                                    <Tile
+                                                        id={cell}
+                                                        tileColor={rowTileColor.toString()}
+                                                        playerColor={
+                                                            playerColor
+                                                        }
+                                                    />
+                                                )
+                                            ) : null}
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </DndContext>
     );

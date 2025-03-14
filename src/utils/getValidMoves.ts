@@ -3,16 +3,16 @@ interface MoveProps {
     gameId: string;
     playerColor: "W" | "B";
     fromTileId: string;
-    toTileId: string;
 }
 
-export const isValidMove = async ({
+export const getValidMoves = async ({
     gameId,
     playerColor,
     fromTileId,
-    toTileId,
 }: MoveProps) => {
     const game = await axios.get(`/api/getGame?gameId=${gameId}`);
+    let tileNum = parseInt(fromTileId.slice(1));
+    let legalTiles: string[] = [];
 
     // If its not the player's turn
     if (game.data.turn !== playerColor) {
@@ -23,9 +23,6 @@ export const isValidMove = async ({
     // If the piece moved was a pawn
     if (game.data.pieceLocations[fromTileId].pieceType === "pawn") {
         if (playerColor === "W") {
-            let tileNum = parseInt(fromTileId.slice(1));
-            let legalTiles: string[] = [];
-            let captures: string[] = [];
 
             // If the pawn is on one of the start tiles
             let startTiles: number[] = [81, 75, 69, 63, 57, 62, 67, 72, 77];
@@ -68,7 +65,7 @@ export const isValidMove = async ({
                     ];
 
                 if (otherPiece.color === "B") {
-                    captures.push(("t" + (tileNum - 6)) as unknown as string);
+                    legalTiles.push(("t" + (tileNum - 6)) as unknown as string);
                 }
             }
 
@@ -83,13 +80,14 @@ export const isValidMove = async ({
                     ];
 
                 if (otherPiece.color === "B") {
-                    captures.push(("t" + (tileNum - 5)) as unknown as string);
+                    legalTiles.push(("t" + (tileNum - 5)) as unknown as string);
                 }
             }
 
             console.log(legalTiles);
-            console.log(captures);
         } else {
         }
     }
+    
+    return legalTiles;
 };

@@ -3,7 +3,9 @@
 import Tile from "./tile";
 import { DndContext } from "@dnd-kit/core";
 import axios from "axios";
-import { isValidMove } from "@/utils/moveValidation";
+import { getValidMoves } from "@/utils/getValidMoves";
+import { validateMove } from "@/utils/validateMoves";
+import { useState } from "react";
 
 interface BoardProps {
     gameId: string;
@@ -64,124 +66,98 @@ export default function Board({
         ["", "", "", "", "", "t1", "", "", "", "", ""],
     ];
 
-    // Handle drag and drop pieces
-    const handleDragEnd = (event: any) => {
+    const boardMap = playerColor === "W" ? boardMapW : boardMapB;
+
+    const [validMoves, setValidMoves] = useState<string[]>([]);
+
+    // Handle drag start (show valid moves)
+    const handleDragStart = async (event: any) => {
+        const { active } = event;
+        const tileId = active.id;
+
+        if (pieceLocations[tileId]?.color === playerColor) {
+            const moves = await getValidMoves({
+                gameId,
+                playerColor,
+                fromTileId: tileId,
+            });
+            setValidMoves(moves || []);
+        }
+    };
+
+    // Handle drag end (move piece)
+    const handleDragEnd = async (event: any) => {
         const { active, over } = event;
         if (over) {
             const fromTileId = active.id;
             const toTileId = over.id;
-            
-            isValidMove({ gameId, playerColor, fromTileId, toTileId })
-            // // If a piece moved to an empty tile, update the piece location and the database
-            // if (fromTileId !== toTileId && !pieceLocations[toTileId]) {
-            //     const updated = { ...pieceLocations };
-            //     updated[toTileId] = updated[fromTileId];
-            //     delete updated[fromTileId];
 
-            //     // Use this format because passing JSON
-            //     axios.put("/api/updateGame", {
-            //         gameId,
-            //         pieceLocations: updated,
-            //     });
-            // }
+            // If the move was valid, update the piece location and the database
+            if (
+                await validateMove({
+                    gameId,
+                    playerColor,
+                    validMoves,
+                    toTileId,
+                })
+            ) {
+                // Update the piece locations
+                const updated = { ...pieceLocations };
+                updated[toTileId] = updated[fromTileId];
+                delete updated[fromTileId];
+
+                let newTurn = "";
+                // Update the turn
+                if (playerColor === "W") {
+                    newTurn = "B";
+                } else {
+                    newTurn = "W";
+                }
+
+                // Use this format because passing JSON
+                axios.put("/api/updateGame", {
+                    gameId,
+                    pieceLocations: updated,
+                    turn: newTurn,
+                });
+            }
         }
+
+        setValidMoves([]);
     };
 
     return (
         // Area for drag and drop
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div>
-                {playerColor === "W" ? (
-                    <div>
-                        {boardMapW.map((row, rowIndex) => {
-                            const rowTileColor = rowIndex % 3;
+                {boardMap.map((row, rowIndex) => {
+                    const rowTileColor = rowIndex % 3;
 
-                            return (
-                                <div
-                                    key={rowIndex}
-                                    className="flex justify-center"
-                                >
-                                    {row.map((cell, cellIndex) => (
-                                        <div key={cellIndex}>
-                                            {cell.startsWith("t") ? (
-                                                cell in pieceLocations ? (
-                                                    <Tile
-                                                        id={cell}
-                                                        tileColor={rowTileColor.toString()}
-                                                        pieceType={
-                                                            pieceLocations[cell]
-                                                                .pieceType
-                                                        }
-                                                        pieceColor={
-                                                            pieceLocations[cell]
-                                                                .color
-                                                        }
-                                                        playerColor={
-                                                            playerColor
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <Tile
-                                                        id={cell}
-                                                        tileColor={rowTileColor.toString()}
-                                                        playerColor={
-                                                            playerColor
-                                                        }
-                                                    />
-                                                )
-                                            ) : null}
-                                        </div>
-                                    ))}
+                    return (
+                        <div key={rowIndex} className="flex justify-center">
+                            {row.map((cell, cellIndex) => (
+                                <div key={cellIndex}>
+                                    {cell.startsWith("t") && (
+                                        <Tile
+                                            id={cell}
+                                            tileColor={rowTileColor.toString()}
+                                            pieceType={
+                                                pieceLocations[cell]?.pieceType
+                                            }
+                                            pieceColor={
+                                                pieceLocations[cell]?.color
+                                            }
+                                            playerColor={playerColor}
+                                            isHighlighted={validMoves.includes(
+                                                cell
+                                            )}
+                                        />
+                                    )}
                                 </div>
-                            );
-                        })}
-                    </div>
-                ) : (
-                    <div>
-                        {boardMapB.map((row, rowIndex) => {
-                            const rowTileColor = rowIndex % 3;
-
-                            return (
-                                <div
-                                    key={rowIndex}
-                                    className="flex justify-center"
-                                >
-                                    {row.map((cell, cellIndex) => (
-                                        <div key={cellIndex}>
-                                            {cell.startsWith("t") ? (
-                                                cell in pieceLocations ? (
-                                                    <Tile
-                                                        id={cell}
-                                                        tileColor={rowTileColor.toString()}
-                                                        pieceType={
-                                                            pieceLocations[cell]
-                                                                .pieceType
-                                                        }
-                                                        pieceColor={
-                                                            pieceLocations[cell]
-                                                                .color
-                                                        }
-                                                        playerColor={
-                                                            playerColor
-                                                        }
-                                                    />
-                                                ) : (
-                                                    <Tile
-                                                        id={cell}
-                                                        tileColor={rowTileColor.toString()}
-                                                        playerColor={
-                                                            playerColor
-                                                        }
-                                                    />
-                                                )
-                                            ) : null}
-                                        </div>
-                                    ))}
-                                </div>
-                            );
-                        })}
-                    </div>
-                )}
+                            ))}
+                        </div>
+                    );
+                })}
             </div>
         </DndContext>
     );

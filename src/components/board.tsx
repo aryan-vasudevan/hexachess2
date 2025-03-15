@@ -120,10 +120,10 @@ export default function Board({
                     pieceLocations: updated,
                     turn: newTurn,
                 });
+                setValidMoves([]);
             }
         }
 
-        setValidMoves([]);
     };
 
     return (

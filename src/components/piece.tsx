@@ -1,20 +1,22 @@
 import { useDraggable } from "@dnd-kit/core";
 
 interface PieceProps {
-    // Unique identifier for the piece
     id: string;
     pieceType: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king";
     pieceColor: "W" | "B";
     draggable: boolean;
 }
 
-export default function Piece({ id, pieceType, pieceColor, draggable }: PieceProps) {
-    // Allow this piece to be draggable
+export default function Piece({
+    id,
+    pieceType,
+    pieceColor,
+    draggable,
+}: PieceProps) {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: id,
     });
 
-    // Apply a transform to move the piece as it is dragged
     const style = {
         transform: transform
             ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
@@ -38,9 +40,7 @@ export default function Piece({ id, pieceType, pieceColor, draggable }: PiecePro
                     />
                 </div>
             ) : (
-                <div
-                    className="absolute z-10 bottom-[11px] left-[25.5px]"
-                >
+                <div className="absolute z-10 bottom-[11px] left-[25.5px]">
                     <img
                         src={`/pieces/${pieceType}${pieceColor}.png`}
                         alt={`${pieceType} (${pieceColor})`}
